@@ -25,7 +25,8 @@ foreach ($file in $files) {
         $content = iwr $url -UseBasicParsing
         $content.Content | Out-File -FilePath $filePath -Encoding UTF8
     } catch {
-        Write-Host "Failed to download $file: $_" -ForegroundColor Red
+        $errorMessage = $_.Exception.Message
+        Write-Host "Failed to download $file: $errorMessage" -ForegroundColor Red
         exit 1
     }
 }
